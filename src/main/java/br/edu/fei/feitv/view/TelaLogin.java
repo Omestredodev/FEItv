@@ -50,6 +50,7 @@ public class TelaLogin extends javax.swing.JFrame {
         btnEntrar.addActionListener(this::btnEntrarActionPerformed);
 
         btnAbrirCadastro.setText("Cadastrar");
+        btnAbrirCadastro.addActionListener(this::btnAbrirCadastroActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -125,6 +126,12 @@ public class TelaLogin extends javax.swing.JFrame {
             );
         }
     }//GEN-LAST:event_btnEntrarActionPerformed
+
+    private void btnAbrirCadastroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirCadastroActionPerformed
+        this.dispose();
+
+        new TelaCadastro().setVisible(true);
+    }//GEN-LAST:event_btnAbrirCadastroActionPerformed
 
     /**
      * @param args the command line arguments
