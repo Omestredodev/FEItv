@@ -6,6 +6,7 @@ import br.edu.fei.feitv.model.Usuario;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 
 public class UsuarioDAO {
 
@@ -37,7 +38,7 @@ public class UsuarioDAO {
         }
     }
 
-    public boolean validarLogin(String email, String senha) {
+    /*public boolean validarLogin(String email, String senha) {
 
         String sql = """
                 SELECT * FROM tb_usuario
@@ -64,6 +65,55 @@ public class UsuarioDAO {
 
             return false;
         }
-    }
+    }*/
+    //Refatoração
+    public Usuario validarLogin(String email, String senha) {
 
+        String sql = """
+                SELECT * FROM tb_usuario
+                WHERE email = ?
+                AND senha = ?
+                """;
+
+        try (
+                Connection conn = ConnectionFactory.conectar();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+
+            stmt.setString(1, email);
+            stmt.setString(2, senha);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+
+                Usuario usuario = new Usuario();
+
+                usuario.setIdUsuario(
+                        rs.getInt("id_usuario")
+                );
+
+                usuario.setNome(
+                        rs.getString("nome")
+                );
+
+                usuario.setEmail(
+                        rs.getString("email")
+                );
+
+                usuario.setSenha(
+                        rs.getString("senha")
+                );
+
+                return usuario;
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println("Erro ao validar login!");
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

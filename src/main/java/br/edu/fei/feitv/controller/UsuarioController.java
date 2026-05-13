@@ -26,7 +26,16 @@ public class UsuarioController {
         usuarioDAO.cadastrarUsuario(usuario);
     }
 
+    /*
     public boolean validarLogin(
+            String email,
+            String senha
+    ) {
+
+        return usuarioDAO.validarLogin(email, senha);
+    }*/
+    //refatoração
+    public Usuario validarLogin(
             String email,
             String senha
     ) {

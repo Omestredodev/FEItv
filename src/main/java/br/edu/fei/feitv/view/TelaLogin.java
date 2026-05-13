@@ -6,6 +6,8 @@ package br.edu.fei.feitv.view;
 
 import br.edu.fei.feitv.controller.UsuarioController;
 import javax.swing.JOptionPane;
+import br.edu.fei.feitv.model.Usuario;
+import br.edu.fei.feitv.session.SessaoUsuario;
 /**
  *
  * @author guilh
@@ -108,15 +110,21 @@ public class TelaLogin extends javax.swing.JFrame {
 
         UsuarioController controller = new UsuarioController();
 
-        boolean loginValido =
+        Usuario usuario =
                 controller.validarLogin(email, senha);
 
-        if (loginValido) {
+        if (usuario != null) {
+
+            SessaoUsuario.setUsuarioLogado(usuario);
 
             JOptionPane.showMessageDialog(
                     this,
                     "Login realizado com sucesso!"
             );
+
+            this.dispose();
+
+            new TelaPrincipal().setVisible(true);
 
         } else {
 
