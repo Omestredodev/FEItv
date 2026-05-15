@@ -9,8 +9,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 /**
- * Tela responsável pelo gerenciamento das listas do usuário.
- * Mantém apenas as operações de lista para reduzir poluição visual.
+ * Tela responsável pelo gerenciamento das playlists do usuário.
+ * Mantém apenas operações de criação, edição, exclusão e abertura de playlists.
  */
 public class TelaFavoritos extends JFrame {
 
@@ -24,7 +24,6 @@ public class TelaFavoritos extends JFrame {
     private JButton btnEditarLista;
     private JButton btnExcluirLista;
     private JButton btnAbrirLista;
-    private JButton btnAtualizar;
     private JButton btnVoltar;
 
     public TelaFavoritos() {
@@ -34,7 +33,7 @@ public class TelaFavoritos extends JFrame {
     }
 
     private void configurarJanela() {
-        setTitle("FEItv - Favoritos / Listas");
+        setTitle("FEItv - Playlists");
         setSize(900, 620);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -57,7 +56,7 @@ public class TelaFavoritos extends JFrame {
         painel.setBackground(new Color(15, 15, 15));
         painel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
 
-        JLabel lblTitulo = new JLabel("Favoritos / Listas");
+        JLabel lblTitulo = new JLabel("Playlists");
         lblTitulo.setForeground(new Color(255, 40, 40));
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 28));
 
@@ -91,30 +90,30 @@ public class TelaFavoritos extends JFrame {
     }
 
     private JPanel criarPainelFormulario() {
-        JPanel painel = criarPainelEscuro("Criar ou editar lista");
+        JPanel painel = criarPainelEscuro("Criar ou editar playlist");
         painel.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(6, 6, 6, 6);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel lblNome = criarLabel("Nome da Lista:");
+        JLabel lblNome = criarLabel("Nome da Playlist:");
         JLabel lblDescricao = criarLabel("Descrição:");
 
         txtNomeLista = new JTextField(25);
         txtDescricao = new JTextField(25);
 
-        btnCriarLista = new JButton("Criar Lista");
+        btnCriarLista = new JButton("Criar Playlist");
         configurarBotaoPrincipal(btnCriarLista);
-        btnCriarLista.addActionListener(e -> criarLista());
+        btnCriarLista.addActionListener(e -> criarPlaylist());
 
-        btnEditarLista = new JButton("Editar Lista");
+        btnEditarLista = new JButton("Editar Playlist");
         configurarBotaoSecundario(btnEditarLista);
-        btnEditarLista.addActionListener(e -> editarLista());
+        btnEditarLista.addActionListener(e -> editarPlaylist());
 
-        btnExcluirLista = new JButton("Excluir Lista");
+        btnExcluirLista = new JButton("Excluir Playlist");
         configurarBotaoPrincipal(btnExcluirLista);
-        btnExcluirLista.addActionListener(e -> excluirLista());
+        btnExcluirLista.addActionListener(e -> excluirPlaylist());
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -147,7 +146,7 @@ public class TelaFavoritos extends JFrame {
     }
 
     private JPanel criarPainelListas() {
-        JPanel painel = criarPainelEscuro("Minhas listas");
+        JPanel painel = criarPainelEscuro("Minhas playlists");
 
         txtAreaListas = new JTextArea(16, 70);
         txtAreaListas.setEditable(false);
@@ -160,21 +159,16 @@ public class TelaFavoritos extends JFrame {
         JPanel painelAcoes = new JPanel(new FlowLayout(FlowLayout.LEFT));
         painelAcoes.setBackground(new Color(24, 24, 24));
 
-        painelAcoes.add(criarLabel("ID da Lista:"));
+        painelAcoes.add(criarLabel("ID da Playlist:"));
 
         txtIdLista = new JTextField(8);
         painelAcoes.add(txtIdLista);
 
-        btnAbrirLista = new JButton("Abrir Lista");
+        btnAbrirLista = new JButton("Abrir Playlist");
         configurarBotaoPrincipal(btnAbrirLista);
-        btnAbrirLista.addActionListener(e -> abrirLista());
-
-        btnAtualizar = new JButton("Atualizar");
-        configurarBotaoSecundario(btnAtualizar);
-        btnAtualizar.addActionListener(e -> carregarListas());
+        btnAbrirLista.addActionListener(e -> abrirPlaylist());
 
         painelAcoes.add(btnAbrirLista);
-        painelAcoes.add(btnAtualizar);
 
         painel.add(scroll, BorderLayout.CENTER);
         painel.add(painelAcoes, BorderLayout.SOUTH);
@@ -204,11 +198,11 @@ public class TelaFavoritos extends JFrame {
         txtAreaListas.setText("");
 
         if (listas.isEmpty()) {
-            txtAreaListas.setText("Nenhuma lista encontrada.");
+            txtAreaListas.setText("Nenhuma playlist encontrada.");
             return;
         }
 
-        txtAreaListas.append("Use o ID da lista para editar, excluir ou abrir.\n");
+        txtAreaListas.append("Use o ID da playlist para editar, excluir ou abrir.\n");
         txtAreaListas.append("---------------------------------------------\n");
 
         for (ListaReproducao lista : listas) {
@@ -219,12 +213,12 @@ public class TelaFavoritos extends JFrame {
         }
     }
 
-    private void criarLista() {
+    private void criarPlaylist() {
         String nomeLista = txtNomeLista.getText();
         String descricao = txtDescricao.getText();
 
         if (nomeLista.isBlank()) {
-            JOptionPane.showMessageDialog(this, "Informe o nome da lista.");
+            JOptionPane.showMessageDialog(this, "Informe o nome da playlist.");
             return;
         }
 
@@ -232,7 +226,7 @@ public class TelaFavoritos extends JFrame {
 
         controller.criarLista(nomeLista, descricao);
 
-        JOptionPane.showMessageDialog(this, "Lista criada com sucesso!");
+        JOptionPane.showMessageDialog(this, "Playlist criada com sucesso!");
 
         txtNomeLista.setText("");
         txtDescricao.setText("");
@@ -240,7 +234,7 @@ public class TelaFavoritos extends JFrame {
         carregarListas();
     }
 
-    private void editarLista() {
+    private void editarPlaylist() {
         int idLista = lerIdLista();
 
         if (idLista == -1) {
@@ -251,7 +245,7 @@ public class TelaFavoritos extends JFrame {
         String descricao = txtDescricao.getText();
 
         if (nomeLista.isBlank()) {
-            JOptionPane.showMessageDialog(this, "Informe o novo nome da lista.");
+            JOptionPane.showMessageDialog(this, "Informe o novo nome da playlist.");
             return;
         }
 
@@ -259,12 +253,12 @@ public class TelaFavoritos extends JFrame {
 
         controller.editarLista(idLista, nomeLista, descricao);
 
-        JOptionPane.showMessageDialog(this, "Lista editada com sucesso!");
+        JOptionPane.showMessageDialog(this, "Playlist editada com sucesso!");
 
         carregarListas();
     }
 
-    private void excluirLista() {
+    private void excluirPlaylist() {
         int idLista = lerIdLista();
 
         if (idLista == -1) {
@@ -273,7 +267,7 @@ public class TelaFavoritos extends JFrame {
 
         int confirmacao = JOptionPane.showConfirmDialog(
                 this,
-                "Deseja realmente excluir esta lista?",
+                "Deseja realmente excluir esta playlist?",
                 "Confirmação",
                 JOptionPane.YES_NO_OPTION
         );
@@ -286,12 +280,12 @@ public class TelaFavoritos extends JFrame {
 
         controller.excluirLista(idLista);
 
-        JOptionPane.showMessageDialog(this, "Lista excluída com sucesso!");
+        JOptionPane.showMessageDialog(this, "Playlist excluída com sucesso!");
 
         carregarListas();
     }
 
-    private void abrirLista() {
+    private void abrirPlaylist() {
         int idLista = lerIdLista();
 
         if (idLista == -1) {
@@ -306,7 +300,7 @@ public class TelaFavoritos extends JFrame {
         try {
             return Integer.parseInt(txtIdLista.getText());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Informe um ID de lista válido.");
+            JOptionPane.showMessageDialog(this, "Informe um ID de playlist válido.");
             return -1;
         }
     }

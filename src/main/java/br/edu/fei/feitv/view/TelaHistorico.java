@@ -14,7 +14,6 @@ public class TelaHistorico extends JFrame {
 
     private JTextArea txtAreaHistorico;
 
-    private JButton btnAtualizar;
     private JButton btnLimpar;
     private JButton btnVoltar;
 
@@ -32,7 +31,6 @@ public class TelaHistorico extends JFrame {
     }
 
     private void criarComponentes() {
-
         JPanel painelPrincipal = new JPanel(new BorderLayout(10, 10));
         painelPrincipal.setBackground(new Color(24, 24, 24));
         painelPrincipal.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
@@ -45,7 +43,6 @@ public class TelaHistorico extends JFrame {
     }
 
     private JPanel criarCabecalho() {
-
         JPanel painel = new JPanel(new BorderLayout());
         painel.setBackground(new Color(15, 15, 15));
         painel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -72,7 +69,6 @@ public class TelaHistorico extends JFrame {
     }
 
     private JPanel criarCentro() {
-
         JPanel painel = new JPanel(new BorderLayout(10, 10));
         painel.setBackground(new Color(24, 24, 24));
         painel.setBorder(BorderFactory.createTitledBorder(
@@ -98,14 +94,9 @@ public class TelaHistorico extends JFrame {
     }
 
     private JPanel criarRodape() {
-
         JPanel painel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         painel.setBackground(new Color(15, 15, 15));
         painel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-        btnAtualizar = new JButton("Atualizar");
-        configurarBotaoSecundario(btnAtualizar);
-        btnAtualizar.addActionListener(e -> carregarHistorico());
 
         btnLimpar = new JButton("Limpar Histórico");
         configurarBotaoPrincipal(btnLimpar);
@@ -115,7 +106,6 @@ public class TelaHistorico extends JFrame {
         configurarBotaoSecundario(btnVoltar);
         btnVoltar.addActionListener(e -> voltar());
 
-        painel.add(btnAtualizar);
         painel.add(btnLimpar);
         painel.add(btnVoltar);
 
@@ -123,7 +113,6 @@ public class TelaHistorico extends JFrame {
     }
 
     private void carregarHistorico() {
-
         HistoricoController controller = new HistoricoController();
 
         ArrayList<String> historico = controller.listarHistorico();
@@ -142,7 +131,6 @@ public class TelaHistorico extends JFrame {
     }
 
     private void limparHistorico() {
-
         int confirmacao = JOptionPane.showConfirmDialog(
                 this,
                 "Deseja realmente limpar todo o histórico?",
@@ -155,7 +143,6 @@ public class TelaHistorico extends JFrame {
         }
 
         HistoricoController controller = new HistoricoController();
-
         controller.limparHistorico();
 
         JOptionPane.showMessageDialog(
@@ -172,7 +159,6 @@ public class TelaHistorico extends JFrame {
     }
 
     private void configurarBotaoPrincipal(JButton botao) {
-
         botao.setBackground(new Color(220, 0, 0));
         botao.setForeground(Color.WHITE);
         botao.setFocusPainted(false);
@@ -181,7 +167,6 @@ public class TelaHistorico extends JFrame {
     }
 
     private void configurarBotaoSecundario(JButton botao) {
-
         botao.setBackground(new Color(70, 70, 70));
         botao.setForeground(Color.WHITE);
         botao.setFocusPainted(false);

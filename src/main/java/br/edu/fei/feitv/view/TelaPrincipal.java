@@ -1,5 +1,6 @@
 package br.edu.fei.feitv.view;
 
+import br.edu.fei.feitv.controller.CurtidaController;
 import br.edu.fei.feitv.controller.HistoricoController;
 import br.edu.fei.feitv.controller.ListaReproducaoController;
 import br.edu.fei.feitv.controller.VideoController;
@@ -12,19 +13,25 @@ import java.util.ArrayList;
 
 /**
  * Tela principal do sistema FEItv.
- * Responsável pela busca de vídeos, acesso aos módulos e adição rápida de vídeos às listas.
+ * Responsável pela busca de vídeos, acesso aos módulos principais,
+ * adição rápida de vídeos às playlists e interação de curtidas.
  */
 public class TelaPrincipal extends JFrame {
 
     private JTextField txtBusca;
     private JTextField txtIdLista;
-    private JTextField txtIdVideo;
+    private JTextField txtIdVideoPlaylist;
+    private JTextField txtIdVideoInteracao;
+
     private JTextArea txtResultado;
 
     private JButton btnBuscar;
     private JButton btnLimpar;
-    private JButton btnAdicionarLista;
-    private JButton btnFavoritos;
+    private JButton btnAdicionarPlaylist;
+    private JButton btnCurtir;
+    private JButton btnDescurtir;
+    private JButton btnVerCurtidas;
+    private JButton btnPlaylists;
     private JButton btnHistorico;
     private JButton btnSair;
 
@@ -35,7 +42,7 @@ public class TelaPrincipal extends JFrame {
 
     private void configurarJanela() {
         setTitle("FEItv - Catálogo");
-        setSize(1050, 700);
+        setSize(1100, 760);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -76,7 +83,7 @@ public class TelaPrincipal extends JFrame {
         return painel;
     }
 
-    private JPanel criarConteudo() {
+    private JScrollPane criarConteudo() {
         JPanel painel = new JPanel();
         painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
         painel.setBackground(new Color(24, 24, 24));
@@ -84,29 +91,34 @@ public class TelaPrincipal extends JFrame {
 
         painel.add(criarPainelBusca());
         painel.add(Box.createVerticalStrut(15));
-        painel.add(criarPainelAdicionarLista());
+        painel.add(criarPainelAdicionarPlaylist());
+        painel.add(Box.createVerticalStrut(15));
+        painel.add(criarPainelInteracoesVideo());
         painel.add(Box.createVerticalStrut(15));
         painel.add(criarPainelResultados());
 
-        return painel;
+        JScrollPane scroll = new JScrollPane(painel);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+
+        return scroll;
     }
 
     /**
-     * Painel de busca separado em duas linhas.
-     * Isso evita que o campo de busca fique pequeno ao abrir a tela em tamanho reduzido.
+     * Painel de busca separado em campo e botões.
+     * Essa estrutura evita que o campo de busca fique pequeno em janelas menores.
      */
     private JPanel criarPainelBusca() {
         JPanel painel = criarPainelEscuro("Buscar vídeos");
 
-        JPanel painelBusca = new JPanel();
-        painelBusca.setLayout(new BoxLayout(painelBusca, BoxLayout.Y_AXIS));
-        painelBusca.setBackground(new Color(24, 24, 24));
+        JPanel conteudo = new JPanel();
+        conteudo.setLayout(new BoxLayout(conteudo, BoxLayout.Y_AXIS));
+        conteudo.setBackground(new Color(24, 24, 24));
 
         JLabel lblBusca = criarLabel("Digite o nome do vídeo:");
 
         txtBusca = new JTextField();
         txtBusca.setMaximumSize(new Dimension(Integer.MAX_VALUE, 34));
-        txtBusca.setPreferredSize(new Dimension(600, 34));
+        txtBusca.setPreferredSize(new Dimension(700, 34));
 
         JPanel linhaCampo = new JPanel(new BorderLayout(10, 10));
         linhaCampo.setBackground(new Color(24, 24, 24));
@@ -121,9 +133,9 @@ public class TelaPrincipal extends JFrame {
         configurarBotaoSecundario(btnLimpar);
         btnLimpar.addActionListener(e -> limparBusca());
 
-        btnFavoritos = new JButton("Favoritos / Listas");
-        configurarBotaoPrincipal(btnFavoritos);
-        btnFavoritos.addActionListener(e -> abrirFavoritos());
+        btnPlaylists = new JButton("Playlists");
+        configurarBotaoPrincipal(btnPlaylists);
+        btnPlaylists.addActionListener(e -> abrirPlaylists());
 
         btnHistorico = new JButton("Histórico");
         configurarBotaoSecundario(btnHistorico);
@@ -133,44 +145,78 @@ public class TelaPrincipal extends JFrame {
         linhaBotoes.setBackground(new Color(24, 24, 24));
         linhaBotoes.add(btnBuscar);
         linhaBotoes.add(btnLimpar);
-        linhaBotoes.add(btnFavoritos);
+        linhaBotoes.add(btnPlaylists);
         linhaBotoes.add(btnHistorico);
 
-        painelBusca.add(linhaCampo);
-        painelBusca.add(Box.createVerticalStrut(10));
-        painelBusca.add(linhaBotoes);
+        conteudo.add(linhaCampo);
+        conteudo.add(Box.createVerticalStrut(10));
+        conteudo.add(linhaBotoes);
 
-        painel.add(painelBusca, BorderLayout.CENTER);
+        painel.add(conteudo, BorderLayout.CENTER);
 
         return painel;
     }
 
     /**
-     * Painel para adicionar rapidamente um vídeo pesquisado em uma lista.
-     * O usuário visualiza os IDs nos resultados e nas listas.
+     * Painel para adicionar rapidamente um vídeo pesquisado em uma playlist.
      */
-    private JPanel criarPainelAdicionarLista() {
-        JPanel painel = criarPainelEscuro("Adicionar vídeo a uma lista");
+    private JPanel criarPainelAdicionarPlaylist() {
+        JPanel painel = criarPainelEscuro("Adicionar vídeo à playlist");
 
         JPanel linha = new JPanel(new FlowLayout(FlowLayout.LEFT));
         linha.setBackground(new Color(24, 24, 24));
 
-        linha.add(criarLabel("ID da Lista:"));
+        linha.add(criarLabel("ID da Playlist:"));
         txtIdLista = new JTextField(8);
         linha.add(txtIdLista);
 
         linha.add(criarLabel("ID do Vídeo:"));
-        txtIdVideo = new JTextField(8);
-        linha.add(txtIdVideo);
+        txtIdVideoPlaylist = new JTextField(8);
+        linha.add(txtIdVideoPlaylist);
 
-        btnAdicionarLista = new JButton("Adicionar à Lista");
-        configurarBotaoPrincipal(btnAdicionarLista);
-        btnAdicionarLista.addActionListener(e -> adicionarVideoNaLista());
+        btnAdicionarPlaylist = new JButton("Adicionar à Playlist");
+        configurarBotaoPrincipal(btnAdicionarPlaylist);
+        btnAdicionarPlaylist.addActionListener(e -> adicionarVideoNaPlaylist());
 
-        linha.add(btnAdicionarLista);
+        linha.add(btnAdicionarPlaylist);
 
-        JLabel dica = criarLabel("Consulte os IDs das listas em Favoritos / Listas.");
+        JLabel dica = criarLabel("Consulte os IDs das playlists na tela Playlists.");
         linha.add(dica);
+
+        painel.add(linha, BorderLayout.CENTER);
+
+        return painel;
+    }
+
+    /**
+     * Painel de ações relacionadas ao vídeo selecionado por ID.
+     */
+    private JPanel criarPainelInteracoesVideo() {
+        JPanel painel = criarPainelEscuro("Interações com vídeo");
+
+        JPanel linha = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        linha.setBackground(new Color(24, 24, 24));
+
+        linha.add(criarLabel("ID do Vídeo:"));
+
+        txtIdVideoInteracao = new JTextField(8);
+        linha.add(txtIdVideoInteracao);
+
+        btnCurtir = new JButton("Curtir");
+        configurarBotaoPrincipal(btnCurtir);
+        btnCurtir.addActionListener(e -> curtirVideo());
+
+        btnDescurtir = new JButton("Descurtir");
+        configurarBotaoSecundario(btnDescurtir);
+        btnDescurtir.addActionListener(e -> descurtirVideo());
+
+        btnVerCurtidas = new JButton("Ver Curtidas");
+        configurarBotaoSecundario(btnVerCurtidas);
+        btnVerCurtidas.addActionListener(e -> verCurtidas());
+
+        linha.add(btnCurtir);
+        linha.add(btnDescurtir);
+        linha.add(btnVerCurtidas);
 
         painel.add(linha, BorderLayout.CENTER);
 
@@ -214,7 +260,6 @@ public class TelaPrincipal extends JFrame {
         historicoController.registrarBusca(termoBusca);
 
         VideoController controller = new VideoController();
-
         ArrayList<Video> videos = controller.buscarVideos(termoBusca);
 
         txtResultado.setText("");
@@ -234,21 +279,84 @@ public class TelaPrincipal extends JFrame {
         }
     }
 
-    private void adicionarVideoNaLista() {
-        int idLista = lerInteiro(txtIdLista, "Informe um ID de lista válido.");
-        int idVideo = lerInteiro(txtIdVideo, "Informe um ID de vídeo válido.");
+    private void adicionarVideoNaPlaylist() {
+        int idLista = lerInteiro(
+                txtIdLista,
+                "Informe um ID de playlist válido."
+        );
+
+        int idVideo = lerInteiro(
+                txtIdVideoPlaylist,
+                "Informe um ID de vídeo válido."
+        );
 
         if (idLista == -1 || idVideo == -1) {
             return;
         }
 
         ListaReproducaoController controller = new ListaReproducaoController();
-
         controller.adicionarVideoNaLista(idLista, idVideo);
 
         JOptionPane.showMessageDialog(
                 this,
-                "Vídeo adicionado à lista com sucesso!"
+                "Vídeo adicionado à playlist com sucesso!"
+        );
+    }
+
+    private void curtirVideo() {
+        int idVideo = lerInteiro(
+                txtIdVideoInteracao,
+                "Informe um ID de vídeo válido para curtir."
+        );
+
+        if (idVideo == -1) {
+            return;
+        }
+
+        CurtidaController controller = new CurtidaController();
+        controller.curtirVideo(idVideo);
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Vídeo curtido com sucesso!"
+        );
+    }
+
+    private void descurtirVideo() {
+        int idVideo = lerInteiro(
+                txtIdVideoInteracao,
+                "Informe um ID de vídeo válido para descurtir."
+        );
+
+        if (idVideo == -1) {
+            return;
+        }
+
+        CurtidaController controller = new CurtidaController();
+        controller.descurtirVideo(idVideo);
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Curtida removida com sucesso!"
+        );
+    }
+
+    private void verCurtidas() {
+        int idVideo = lerInteiro(
+                txtIdVideoInteracao,
+                "Informe um ID de vídeo válido para consultar curtidas."
+        );
+
+        if (idVideo == -1) {
+            return;
+        }
+
+        CurtidaController controller = new CurtidaController();
+        int total = controller.contarCurtidas(idVideo);
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Total de curtidas do vídeo " + idVideo + ": " + total
         );
     }
 
@@ -266,7 +374,7 @@ public class TelaPrincipal extends JFrame {
         txtResultado.setText("");
     }
 
-    private void abrirFavoritos() {
+    private void abrirPlaylists() {
         this.dispose();
         new TelaFavoritos().setVisible(true);
     }
