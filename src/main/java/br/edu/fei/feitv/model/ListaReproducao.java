@@ -2,6 +2,10 @@ package br.edu.fei.feitv.model;
 
 import java.util.ArrayList;
 
+/**
+ * Representa uma lista de reprodução criada por um usuário.
+ * Uma lista pertence a um usuário e pode conter vários vídeos.
+ */
 public class ListaReproducao {
 
     private int idLista;
@@ -46,6 +50,7 @@ public class ListaReproducao {
         this.nome = nome;
     }
 
+
     public String getDescricao() {
         return descricao;
     }
@@ -53,6 +58,7 @@ public class ListaReproducao {
     public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
+
 
     public Usuario getUsuario() {
         return usuario;
@@ -68,5 +74,13 @@ public class ListaReproducao {
 
     public void setVideos(ArrayList<Video> videos) {
         this.videos = videos;
+    }
+
+    /**
+     * Usado para exibir a lista de forma legível em componentes visuais.
+     */
+    @Override
+    public String toString() {
+        return idLista + " - " + nome;
     }
 }

@@ -1,5 +1,9 @@
 package br.edu.fei.feitv.model;
 
+/**
+ * Classe abstrata que representa um vídeo genérico no sistema.
+ * Serve como base para Filme e Série, aplicando herança e polimorfismo.
+ */
 public abstract class Video {
 
     private int idVideo;
@@ -13,7 +17,6 @@ public abstract class Video {
 
     public Video(int idVideo, String titulo, String descricao,
                  String genero, int anoLancamento) {
-
         this.idVideo = idVideo;
         this.titulo = titulo;
         this.descricao = descricao;
@@ -59,5 +62,13 @@ public abstract class Video {
 
     public void setAnoLancamento(int anoLancamento) {
         this.anoLancamento = anoLancamento;
+    }
+
+    /**
+     * Usado para exibir o vídeo de forma legível em componentes visuais.
+     */
+    @Override
+    public String toString() {
+        return idVideo + " - " + titulo;
     }
 }
